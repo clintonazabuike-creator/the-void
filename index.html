@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE VOID | ClintonAzabuike-Creator</title>
+    <style>
+        :root { --bg: #000000; --text: #ffffff; --dim: #333; }
+        body, html { margin: 0; padding: 0; width: 100%; height: 100%; background: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; overflow: hidden; }
+        
+        #ui-layer { position: absolute; z-index: 10; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 1s; }
+        
+        h1 { letter-spacing: 15px; font-weight: 200; opacity: 0.6; text-transform: uppercase; }
+        textarea { background: transparent; border: 1px solid var(--dim); color: white; width: 80%; max-width: 500px; height: 150px; padding: 20px; border-radius: 8px; font-size: 18px; outline: none; transition: 0.5s; }
+        textarea:focus { border-color: white; }
+
+        .btn-release { margin-top: 30px; background: transparent; border: 1px solid white; color: white; padding: 15px 40px; cursor: pointer; text-transform: uppercase; letter-spacing: 5px; transition: 0.3s; }
+        .btn-release:hover { background: white; color: black; }
+
+        canvas { position: absolute; top: 0; left: 0; z-index: 1; pointer-events: none; }
+        
+        footer { position: absolute; bottom: 20px; font-size: 10px; opacity: 0.3; letter-spacing: 2px; }
+    </style>
+</head>
+<body>
+
+<div id="ui-layer">
+    <h1>The Void</h1>
+    <p style="opacity: 0.4;">Type what you wish to let go of...</p>
+    <textarea id="soulInput" placeholder="Write it here..."></textarea>
+    <button class="btn-release" onclick="releaseToVoid()">Release</button>
+    <footer>BY CLINTONAZABUIKE-CREATOR</footer>
+</div>
+
+<canvas id="voidCanvas"></canvas>
+
+<script>
+    const canvas = document.getElementById('voidCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    class Particle {
+        constructor(x, y) {
+            this.x = x;
+            this.y = y;
+            this.size = Math.random() * 3 + 1;
+            this.speedX = Math.random() * 6 - 3;
+            this.speedY = Math.random() * 6 - 3;
+            this.opacity = 1;
+        }
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.opacity -= 0.01;
+        }
+        draw() {
+            ctx.fillStyle = `rgba(255, 255, 255, ${this.opacity})`;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    function releaseToVoid() {
+        const input = document.getElementById('soulInput');
+        if (input.value.length < 1) return;
+
+        // Hide UI
+        document.getElementById('ui-layer').style.opacity = '0';
+        
+        // Create particles at center
+        for(let i = 0; i < 200; i++) {
+            particles.push(new Particle(canvas.width/2, canvas.height/2));
+        }
+
+        // Clear input and bring back UI after 3 seconds
+        setTimeout(() => {
+            input.value = "";
+            document.getElementById('ui-layer').style.opacity = '1';
+        }, 3000);
+
+        animate();
+    }
+
+    function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+            particles[i].update();
+            particles[i].draw();
+            if (particles[i].opacity <= 0) {
+                particles.splice(i, 1);
+                i--;
+            }
+        }
+        if(particles.length > 0) requestAnimationFrame(animate);
+    }
+</script>
+
+</body>
+</html>
